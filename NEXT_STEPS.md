@@ -65,3 +65,18 @@ git status --short --branch
 ```
 
 제출 원격 저장소는 [lstldg77-gif/codyssey-assignment](https://github.com/lstldg77-gif/codyssey-assignment)이며 기본 작업 브랜치는 `main`이다. 이메일과 인증정보는 출력·문서에 공개하지 않는다.
+
+## 보너스: Docker Compose 단일 웹 서비스
+
+프로젝트 루트의 `compose.yaml`은 Dockerfile로 웹 이미지를 빌드하고 호스트 `8083` 포트에 공개한다.
+
+```powershell
+docker compose up --build -d
+docker compose ps
+docker compose logs web
+Invoke-WebRequest -UseBasicParsing http://localhost:8083
+docker compose down
+docker compose ps
+```
+
+`up`은 빌드 및 실행, `ps`는 상태 확인, `logs`는 서비스 로그 확인, `down`은 실행한 Compose 리소스 정리에 사용한다. 호스트 포트 `8083`이 사용 중이면 `compose.yaml`에서 다른 포트를 지정한다.

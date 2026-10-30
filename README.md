@@ -1,4 +1,4 @@
-# 코디세이 개발 환경 구축 및 Docker 실습
+# 코디세이 개발 환경 구축 및 Docker 실습 (보너스 과제 포함)
 
 > 실습일: 2026-10-30  
 > 제출 저장소: [lstldg77-gif/codyssey-assignment](https://github.com/lstldg77-gif/codyssey-assignment)
@@ -35,6 +35,7 @@ Windows PowerShell과 WSL Ubuntu에서 터미널·파일 권한을 연습하고,
 | 바인드 마운트 | 완료 | [8081 브라우저](evidence/12-bind-mount-browser.png) |
 | named volume 영속성 | 완료 | [볼륨 데이터 확인](evidence/16-docker-volume.png) |
 | Git 설정·GitHub 연결 | 완료 | 아래 [Git 및 GitHub](#10-git-설정과-github-연동), [GitHub 저장소](https://github.com/lstldg77-gif/codyssey-assignment) |
+| **보너스 과제: Compose 단일 서비스** | **완료** | 아래 [Compose 실습](#14-보너스-과제-docker-compose-단일-서비스) |
 
 ## 4. 터미널 조작 로그
 
@@ -266,3 +267,54 @@ README에는 이메일을 마스킹했고 인증 토큰·비밀번호·개인키
 1. Docker 설치 전 또는 기존 PowerShell에서 `docker`가 인식되지 않았다. Docker Desktop을 실행한 뒤 새 PowerShell에서 버전을 확인했다. [오류 화면](evidence/04a-docker-not-found.png), [정상 버전 확인](evidence/04-docker-version.png)
 2. `http://localhost:8080`은 PowerShell 명령이 아니라 브라우저 주소다. 브라우저에서 NGINX 기본 페이지를 확인했다. [터미널](evidence/09-nginx-terminal.png), [브라우저](evidence/10-nginx-browser.png)
 3. `root@...:/#`는 Ubuntu 컨테이너 프롬프트 예시이지 실행 명령이 아니다. 컨테이너 내부에서 `pwd`, `ls`를 실행했다. [Ubuntu 컨테이너](evidence/07-ubuntu-container.png)
+
+## 14. 보너스 과제: Docker Compose 단일 서비스
+
+`compose.yaml`은 기존 Dockerfile로 웹 이미지를 빌드해 `web` 서비스로 실행한다. 호스트 포트 `8083`을 컨테이너 포트 `80`에 연결한다. Compose를 사용하면 실행 설정을 파일로 저장해 같은 명령으로 재현할 수 있다.
+
+```yaml
+services:
+  web:
+    build: .
+    ports:
+      - "8083:80"
+```
+
+프로젝트 루트에서 실행하고 서비스 상태, 로그, HTTP 응답을 확인한다.
+
+```powershell
+docker compose up --build -d
+docker compose ps
+docker compose logs web
+Invoke-WebRequest -UseBasicParsing http://localhost:8083
+docker compose down
+docker compose ps
+```
+
+`up`은 이미지를 빌드하고 서비스를 시작하며, `ps`와 `logs`는 상태와 로그를 확인하고, `down`은 Compose 컨테이너와 네트워크를 정리한다. 이 서비스의 실행·응답·종료는 아래 검증 로그에서 확인할 수 있다. 포트 `8083`이 이미 사용 중이면 Compose 설정의 호스트 포트를 비어 있는 포트로 변경한다.
+
+실행 검증 결과:
+
+```text
+PS> docker compose up --build -d
+Image codyssey-assignment-web Built
+Container codyssey-assignment-web-1 Started
+
+PS> docker compose ps
+NAME                        SERVICE   STATUS                  PORTS
+codyssey-assignment-web-1   web       Up Less than a second   0.0.0.0:8083->80/tcp
+
+PS> docker compose logs web
+web-1 | ... Configuration complete; ready for start up
+
+PS> Invoke-WebRequest -UseBasicParsing http://localhost:8083
+<h1>Codyssey Docker Project</h1>
+<p>Made by Dongpal</p>
+
+PS> docker compose down
+Container codyssey-assignment-web-1 Removed
+Network codyssey-assignment_default Removed
+
+PS> docker compose ps
+NAME    SERVICE   STATUS   PORTS
+```
