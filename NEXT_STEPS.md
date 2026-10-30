@@ -1,33 +1,49 @@
-# 다음 실습 안내 (Windows PowerShell)
+# 실습 재현 명령어
 
-아래 명령어는 **실행 예정**이며, 아직 성공을 확인하지 않았다. 프로젝트 폴더(`C:\Users\User\codyssey-workspace`)에서 진행한다.
+수행 결과와 증거 링크는 [README.md](README.md)에 정리했다. 아래 명령은 해당 절차를 다시 확인할 때 사용한다. 프로젝트 폴더 경로는 각자 환경에 맞게 바꾼다.
 
-## A. 바인드 마운트 확인 — 완료
+## PowerShell 파일 조작
 
 ```powershell
-cd C:\Users\User\codyssey-workspace
-docker stop codyssey-web
-docker run -d --name codyssey-myweb -p 8081:80 -v "${PWD}:/usr/share/nginx/html:ro" nginx
-docker ps
+New-Item -ItemType Directory -Force practice | Out-Null
+Set-Location practice
+Get-Location
+New-Item -ItemType File -Name .hidden-note
+Set-Content -Path notes.txt -Value 'terminal practice'
+Get-ChildItem -Force | Select-Object Name,Length
+Get-Content notes.txt
+New-Item -ItemType File -Name empty.txt
+Copy-Item notes.txt copy.txt
+Move-Item copy.txt renamed.txt
+Remove-Item renamed.txt
+Test-Path renamed.txt
 ```
 
-크롬에서 `http://localhost:8081`을 열어 개인 웹페이지가 표시된 것을 확인했다. 사진은 `evidence/12-bind-mount-browser.png`에 보관했다. **HTML 수정 후 새로고침으로 변화를 확인하는 추가 실습은 아직 미완료**다.
+`Get-ChildItem -Force`로 숨김 항목을 포함해 확인하고, 마지막 `Test-Path`가 `False`이면 삭제된 것이다.
 
-**주의:** 기존 이름 `codyssey-myweb` 컨테이너가 이미 있다면 같은 이름의 `docker run`은 오류가 난다. 이 경우 먼저 `docker ps -a`를 확인한다.
+## Docker 운영 확인
 
-## B. Dockerfile 빌드 (이 패키지의 `Dockerfile`, `index.html` 사용)
+```powershell
+docker --version
+docker info
+docker images
+docker ps
+docker ps -a
+docker logs codyssey-built
+docker stats --no-stream
+Invoke-WebRequest -UseBasicParsing http://localhost:8082
+```
 
-이 패키지의 파일들을 Windows `codyssey-workspace` 폴더에 복사한 후 해당 폴더에서 진행한다.
+커스텀 이미지가 아직 없다면 프로젝트 루트에서 먼저 빌드한다.
 
 ```powershell
 docker build -t codyssey-site:1.0 .
 docker run -d --name codyssey-built -p 8082:80 codyssey-site:1.0
-docker ps
 ```
 
-크롬에서 `http://localhost:8082` 확인 후 사진 촬영.
+같은 이름의 컨테이너가 이미 있으면 `docker ps -a`로 상태를 확인하고, 데이터가 필요 없는지 확인하기 전에는 삭제하지 않는다.
 
-## C. Docker named volume — 완료
+## Named volume 영속성 재확인
 
 ```powershell
 docker volume create codyssey-data
@@ -36,16 +52,16 @@ docker run --rm -v codyssey-data:/data alpine cat /data/result.txt
 docker volume inspect codyssey-data
 ```
 
-두 번째 `docker run`에서 `codyssey-persistent-data`가 출력되어 컨테이너가 없어져도 데이터가 남는 것을 확인했다. 사진은 `evidence/16-docker-volume.png`에 보관했다.
+읽기 명령의 출력이 `codyssey-persistent-data`인지 확인한다. `docker volume rm`은 저장 데이터도 삭제하므로 재현 확인 중에는 실행하지 않는다.
 
-## D. Git / GitHub (아직 미완료)
+## GitHub 원격 저장소 확인
 
 ```powershell
 git --version
-git status
-git init -b main
-git add README.md NEXT_STEPS.md Dockerfile index.html .dockerignore .gitignore evidence
-git commit -m "Document Codyssey developer environment practice"
+git config --get user.name
+git config --get init.defaultBranch
+git remote -v
+git status --short --branch
 ```
 
-Git 사용자 정보가 없으면 본인 이름·GitHub에 사용하는 메일을 `git config --global user.name`, `git config --global user.email`로 설정한다. 원격 저장소 생성과 `git push`는 실제 GitHub 주소가 정해진 뒤 진행한다. 아직 제출 완료로 표시하지 않는다.
+제출 원격 저장소는 [lstldg77-gif/codyssey-assignment](https://github.com/lstldg77-gif/codyssey-assignment)이며 기본 작업 브랜치는 `main`이다. 이메일과 인증정보는 출력·문서에 공개하지 않는다.
