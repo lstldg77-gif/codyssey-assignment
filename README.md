@@ -36,9 +36,10 @@ Windows 11에서 PowerShell, WSL Ubuntu, Docker Desktop을 설치하고 기본 �
 | 컨테이너 목록 및 로그 조회 | 완료 | [ps 및 logs](evidence/08-docker-logs.png) |
 | Nginx 실행 및 8080:80 포트 연결 | 완료 | [명령어](evidence/09-nginx-terminal.png) / [브라우저](evidence/10-nginx-browser.png) |
 | 개인 `index.html` 생성 및 내용 조회 | 완료 | [파일 생성](evidence/11-custom-html.png) |
-| 개인 HTML을 8081에서 바인드 마운트 | **확인 대기** | 다음 실습 후 사진 추가 |
-| Dockerfile 이미지 빌드 및 실행 | **추가 실습 예정** | 추후 추가 |
-| Docker named volume 데이터 보존 | **추가 실습 예정** | 추후 추가 |
+| 개인 HTML을 8081에서 바인드 마운트 | 완료 | [8081 개인 웹페이지](evidence/12-bind-mount-browser.png) |
+| Dockerfile 이미지 빌드 (`codyssey-site:1.0`) | 완료 | [이미지 빌드 및 목록](evidence/13-docker-build.png) |
+| Dockerfile 이미지로 웹서버 실행 (8082) | 완료 | [컨테이너 실행](evidence/14-docker-run-terminal.png) / [8082 웹페이지](evidence/15-dockerfile-browser.png) |
+| Docker named volume 데이터 보존 | 완료 | [볼륨 생성·저장·재확인](evidence/16-docker-volume.png) |
 | Git 초기화, 커밋 및 GitHub 업로드 | **추가 실습 예정** | 추후 추가 |
 
 ## 4. 실제로 실행한 주요 명령어
@@ -108,11 +109,8 @@ Get-Content index.html
 
 ## 7. 이어서 진행할 실습
 
-1. `docker stop codyssey-web` 후 `8081:80` 바인드 마운트 실행 및 브라우저 확인
-2. HTML 수정 후 브라우저 새로고침으로 반영 확인
-3. `Dockerfile`로 `codyssey-site` 이미지 빌드 후 `8082:80`으로 실행
-4. Docker named volume 데이터 보존 실험 및 로그·상태 캡처
-5. Git 버전·사용자 설정 확인, 저장소 생성·커밋, GitHub 업로드
-6. 완료 증빙과 정확한 저장소 주소를 이 README에 추가
+1. HTML 수정 후 브라우저 새로고침으로 반영 확인
+2. Git 버전·사용자 설정 확인, 저장소 생성·커밋, GitHub 업로드
+3. 완료 증빙과 정확한 저장소 주소를 이 README에 추가
 
 `NEXT_STEPS.md`에 복사해 실행할 명령어를 정리했다.
